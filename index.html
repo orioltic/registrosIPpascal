@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Registros Pascal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #1a252f;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --level1: #3498db;
+            --level2: #2ecc71;
+            --level3: #f39c12;
+            --level4: #e74c3c;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            color: var(--light);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+        
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        header {
+            text-align: center;
+            padding: 30px 20px;
+            margin-bottom: 40px;
+            animation: fadeIn 1s ease-out;
+        }
+        
+        .logo {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            color: white;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            border: 5px solid var(--light);
+        }
+        
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            background: linear-gradient(to right, var(--light), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .subtitle {
+            font-size: 1.5rem;
+            max-width: 800px;
+            margin: 0 auto;
+            color: var(--light);
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+        
+        .levels-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin: 40px 0;
+        }
+        
+        .level-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        
+        .level-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+        
+        .level-header {
+            padding: 25px 20px;
+            text-align: center;
+            color: white;
+        }
+        
+        .level-1 .level-header { background: linear-gradient(to right, var(--level1), #2980b9); }
+        .level-2 .level-header { background: linear-gradient(to right, var(--level2), #27ae60); }
+        .level-3 .level-header { background: linear-gradient(to right, var(--level3), #d35400); }
+        .level-4 .level-header { background: linear-gradient(to right, var(--level4), #c0392b); }
+        
+        .level-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+        
+        .level-title {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .level-number {
+            background: white;
+            color: var(--dark);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 0 auto 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .level-content {
+            padding: 25px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .level-description {
+            margin-bottom: 25px;
+            line-height: 1.6;
+            font-size: 1.05rem;
+            flex-grow: 1;
+        }
+        
+        .features {
+            margin-bottom: 25px;
+        }
+        
+        .feature {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+        }
+        
+        .feature i {
+            margin-right: 10px;
+            color: var(--secondary);
+        }
+        
+        .btn {
+            display: block;
+            text-align: center;
+            padding: 14px 20px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            margin-top: auto;
+        }
+        
+        .level-1 .btn { background: var(--level1); color: white; }
+        .level-2 .btn { background: var(--level2); color: white; }
+        .level-3 .btn { background: var(--level3); color: white; }
+        .level-4 .btn { background: var(--level4); color: white; }
+        
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .btn i {
+            margin-left: 8px;
+            transition: transform 0.3s ease;
+        }
+        
+        .btn:hover i {
+            transform: translateX(5px);
+        }
+        
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            margin-top: 50px;
+            font-size: 1.1rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .author {
+            font-weight: 600;
+            color: var(--secondary);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .level-card {
+            animation: fadeIn 0.6s ease-out;
+        }
+        
+        .level-card:nth-child(1) { animation-delay: 0.1s; }
+        .level-card:nth-child(2) { animation-delay: 0.2s; }
+        .level-card:nth-child(3) { animation-delay: 0.3s; }
+        .level-card:nth-child(4) { animation-delay: 0.4s; }
+        
+        @media (max-width: 768px) {
+            h1 { font-size: 2.5rem; }
+            .subtitle { font-size: 1.2rem; }
+            .levels-container { grid-template-columns: 1fr; }
+            .level-title { font-size: 1.6rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-laptop-code"></i>
+            </div>
+            <h1>Simulador de Registros Pascal</h1>
+            <p class="subtitle">
+                Aprende y practica el manejo de registros en Pascal con nuestro simulador interactivo. 
+                Selecciona un nivel para comenzar tu aprendizaje paso a paso, desde conceptos básicos 
+                hasta estructuras complejas con arrays.
+            </p>
+        </header>
+        
+        <div class="levels-container">
+            <!-- Nivel 1: Registro Simple -->
+            <div class="level-card level-1">
+                <div class="level-header">
+                    <div class="level-number">1</div>
+                    <div class="level-icon">
+                        <i class="fas fa-cube"></i>
+                    </div>
+                    <h2 class="level-title">Registro Simple</h2>
+                </div>
+                <div class="level-content">
+                    <p class="level-description">
+                        Introducción a los registros en Pascal. Aprende a crear y manipular registros 
+                        simples con campos básicos. Ideal para comprender los fundamentos de las 
+                        estructuras de datos en Pascal.
+                    </p>
+                    <div class="features">
+                        <div class="feature">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Conceptos básicos de registros</span>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Declaración y acceso a campos</span>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Asignación de valores</span>
+                        </div>
+                    </div>
+                    <a href="RegistroSimple.html" class="btn">
+                        Comenzar Nivel 1 <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Nivel 2: Registro Anidado -->
+            <div class="level-card level-2">
+                <div class="level-header">
+                    <div class="level-number">2</div>
+                    <div class="level-icon">
+                        <i class="fas fa-cubes"></i>
+                    </div>
+                    <h2 class="level-title">Registro Anidado</h2>
+                </div>
+                <div class="level-content">
+                    <p class="level-description">
+                        Avanza con registros que contienen otros registros. Domina el manejo de 
+                        estructuras anidadas y aprende a acceder a campos en múltiples niveles 
+                        de profundidad.
+                    </p>
+                    <div class="features">
+                        <div class="feature">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Registros dentro de registros</span>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Acceso a campos anidados</span>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Manipulación de estructuras complejas</span>
+                        </div>
+                    </div>
+                    <a href="RegistroAnidado.html" class="btn">
+                        Comenzar Nivel 2 <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Nivel 3: Registro Anidado con Array -->
+            <div class="level-card level-3">
+                <div class="level-header">
+                    <div class="level-number">3</div>
+                    <div class="level-icon">
+                        <i class="fas fa-layer-group"></i>
+                    </div>
+                    <h2 class="level-title">Registro con Array</h2>
+                </div>
+                <div class="level-content">
+                    <p class="level-description">
+                        Combina registros con arrays para crear estructuras más complejas. 
+                        Aprende a manejar listas de datos dentro de registros y a utilizar 
+                        el concepto de "tope" para arrays dinámicos.
+                    </p>
+                    <div class="features">
+                        <div class="feature">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Arrays dentro de registros</span>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Manejo del tope para arrays</span>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Asignación de valores en arrays</span>
+                        </div>
+                    </div>
+                    <a href="RegistroAnidadoConArray.html" class="btn">
+                        Comenzar Nivel 3 <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Nivel 4: Array de Registros -->
+            <div class="level-card level-4">
+                <div class="level-header">
+                    <div class="level-number">4</div>
+                    <div class="level-icon">
+                        <i class="fas fa-project-diagram"></i>
+                    </div>
+                    <h2 class="level-title">Array de Registros</h2>
+                </div>
+                <div class="level-content">
+                    <p class="level-description">
+                        Domina el nivel avanzado trabajando con arrays bidimensionales de registros. 
+                        Simula estructuras de datos complejas como un hospital con múltiples plantas 
+                        y habitaciones, cada una con su propio registro de paciente.
+                    </p>
+                    <div class="features">
+                        <div class="feature">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Arrays bidimensionales de registros</span>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Manipulación de estructuras complejas</span>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Modo libre para asignaciones</span>
+                        </div>
+                    </div>
+                    <a href="ArrayRegistro.html" class="btn">
+                        Comenzar Nivel 4 <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Desarrollado por <span class="author">Oriol Borrás-Gené (URJC)</span> | Simulador Educativo de Programación Pascal</p>
+        </footer>
+    </div>
+</body>
+</html>

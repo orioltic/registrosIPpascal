@@ -1,0 +1,1354 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador Avanzado de Registros Pascal</title>
+    <style>
+        :root {
+            --bg-main: #1e1e1e;
+            --bg-panel: #2d2d2d;
+            --bg-box: #3a3a3a;
+            --text-color: #e0e0e0;
+            --success: #6ecf68;
+            --error: #f75e5e;
+            --warning: #f7c85e;
+            --integer: #5e8cff;
+            --real: #d966ff;
+            --string: #6ecf68;
+            --char: #5ed9ff;
+            --array: #ff6e6e;
+            --border: #444;
+            --shadow: rgba(0, 0, 0, 0.3);
+            --terminal-bg: #1a1a1a;
+            --nested-bg: #333;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: var(--bg-main);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Header Styles */
+        header {
+            background-color: var(--bg-panel);
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px var(--shadow);
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .title-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            width: 60px;
+            height: 60px;
+            background-color: var(--success);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--bg-main);
+            box-shadow: 0 2px 5px var(--shadow);
+        }
+
+        h1 {
+            font-size: 1.8rem;
+        }
+
+        .author {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 0.8rem;
+            color: #ccc;
+        }
+
+        /* Introduction Panel */
+        .intro-panel {
+            background-color: var(--bg-panel);
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px var(--shadow);
+            margin-bottom: 20px;
+            border-left: 4px solid var(--warning);
+        }
+
+        .intro-title {
+            color: var(--warning);
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        /* Exercise Panel */
+        .exercise-panel {
+            background-color: var(--bg-panel);
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px var(--shadow);
+            margin-bottom: 20px;
+        }
+
+        .exercise-title {
+            color: var(--warning);
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        .exercise-description {
+            margin-bottom: 10px;
+        }
+
+        /* Main Content */
+        .main-content {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .code-panel, .visual-panel {
+            background-color: var(--bg-panel);
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px var(--shadow);
+            flex: 1;
+            min-height: 350px;
+        }
+
+        .panel-title {
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        /* Code Panel */
+        .pascal-code {
+            background-color: var(--bg-box);
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', Courier, monospace;
+            white-space: pre-wrap;
+            overflow-x: auto;
+            min-height: 300px;
+            line-height: 1.5;
+        }
+
+        .code-keyword {
+            color: #569cd6;
+        }
+
+        .code-type {
+            color: #4ec9b0;
+        }
+
+        .code-comment {
+            color: #6a9955;
+        }
+
+        /* Visual Panel - Registro vertical */
+        .record-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            min-height: 300px;
+        }
+
+        .record-field {
+            background-color: var(--bg-box);
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px var(--shadow);
+        }
+
+        .field-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .field-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .field-type {
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+
+        .field-value {
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            padding: 8px 15px;
+            min-width: 100px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        /* Registro anidado */
+        .nested-record {
+            background-color: var(--nested-bg);
+            border-radius: 5px;
+            padding: 10px;
+            margin-top: 10px;
+            margin-left: 20px;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.3);
+        }
+
+        .nested-record .record-field {
+            background-color: var(--bg-main);
+            margin-bottom: 8px;
+        }
+
+        .nested-record .record-field:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Array de medicamentos */
+        .array-container {
+            background-color: var(--nested-bg);
+            border-radius: 5px;
+            padding: 10px;
+            margin-top: 10px;
+            margin-left: 20px;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.3);
+        }
+
+        .array-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--array);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .array-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .array-item {
+            background-color: var(--bg-box);
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            padding: 8px;
+            text-align: center;
+            position: relative;
+        }
+
+        .array-index {
+            position: absolute;
+            top: -10px;
+            left: 5px;
+            background: var(--bg-main);
+            padding: 0 5px;
+            font-size: 0.7rem;
+            color: #aaa;
+        }
+
+        .array-value {
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        .tope-indicator {
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.8rem;
+            color: var(--warning);
+            white-space: nowrap;
+        }
+
+        /* Terminal Panel */
+        .terminal-panel {
+            background-color: var(--terminal-bg);
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px var(--shadow);
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        .terminal-output {
+            background-color: var(--terminal-bg);
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            min-height: 100px;
+            max-height: 200px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            font-family: 'Courier New', Courier, monospace;
+            border: 1px solid var(--border);
+            line-height: 1.5;
+        }
+
+        .terminal-input {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .prompt {
+            color: var(--success);
+            font-weight: bold;
+        }
+
+        .terminal {
+            flex-grow: 1;
+            background-color: var(--bg-main);
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            padding: 10px;
+            font-family: 'Courier New', Courier, monospace;
+            color: var(--text-color);
+            outline: none;
+        }
+
+        .terminal:focus {
+            border-color: var(--warning);
+        }
+
+        .btn {
+            background-color: var(--bg-box);
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            padding: 10px 15px;
+            color: var(--text-color);
+            font-family: 'Courier New', Courier, monospace;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px var(--shadow);
+        }
+
+        .btn-next {
+            background-color: var(--success);
+            color: var(--bg-main);
+        }
+
+        .btn-reset {
+            background-color: var(--error);
+            color: var(--bg-main);
+        }
+
+        .btn-assign {
+            background-color: var(--integer);
+            color: var(--bg-main);
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+        }
+
+        /* Feedback messages */
+        .feedback {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 3px;
+            text-align: left;
+            font-weight: normal;
+            display: none;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .success {
+            background-color: rgba(110, 207, 104, 0.15);
+            color: var(--success);
+            border: 1px solid var(--success);
+            display: block;
+        }
+
+        .error {
+            background-color: rgba(247, 94, 94, 0.15);
+            color: var(--error);
+            border: 1px solid var(--error);
+            display: block;
+        }
+
+        /* Exercise Navigation */
+        .exercise-nav {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .exercise-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--bg-box);
+            border: 1px solid var(--border);
+            color: var(--text-color);
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .exercise-btn.active {
+            background-color: var(--warning);
+            color: var(--bg-main);
+        }
+
+        .exercise-btn:hover:not(.active) {
+            background-color: var(--bg-panel);
+        }
+
+        /* Type-specific colors */
+        .type-integer { color: var(--integer); }
+        .type-real { color: var(--real); }
+        .type-string { color: var(--string); }
+        .type-char { color: var(--char); }
+        .type-array { color: var(--array); }
+        
+        /* Input hint */
+        .input-hint {
+            color: #aaa;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+        
+        /* Value formatting */
+        .empty-value {
+            color: #888;
+            font-style: italic;
+        }
+        
+        /* Syntax highlighting in feedback */
+        .code-example {
+            background-color: var(--bg-box);
+            padding: 3px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', Courier, monospace;
+            display: inline-block;
+            margin: 3px 0;
+        }
+        
+        .correct-code {
+            color: var(--success);
+            font-weight: bold;
+        }
+        
+        .highlight {
+            background-color: rgba(247, 202, 94, 0.2);
+            padding: 2px 4px;
+            border-radius: 3px;
+            border: 1px solid rgba(247, 202, 94, 0.5);
+        }
+        
+        .free-mode-panel {
+            background-color: var(--bg-box);
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+        }
+        
+        .field-selector {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: var(--bg-main);
+            border: 1px solid var(--border);
+            color: var(--text-color);
+            border-radius: 3px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        
+        .free-input-container {
+            display: flex;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="title-container">
+                <div class="logo">O</div>
+                <h1>🧪 Simulador Avanzado de Registros Pascal</h1>
+            </div>
+            <div class="author">Oriol Borrás-Gené (URJC)</div>
+        </header>
+
+        <div class="intro-panel">
+            <div class="intro-title">Registros Avanzados con Arrays</div>
+            <div class="intro-description">
+                Hemos añadido un campo de tipo array para almacenar hasta 3 códigos de medicación (índices 0-2). El campo "Tope" indica la última posición utilizada. Inicialmente, Tope es -1 (ningún medicamento almacenado).
+            </div>
+        </div>
+
+        <div class="exercise-panel">
+            <div class="exercise-title">Ejercicio <span id="exercise-number">1</span>/5</div>
+            <div class="exercise-description" id="exercise-description">
+                Repaso: Asigna el mes de nacimiento del paciente con el valor 'Enero'.
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="code-panel">
+                <div class="panel-title">Código Pascal</div>
+                <div class="pascal-code" id="pascal-code">type
+  TFecha = record
+    dia: integer;
+    mes: string;
+    anio: integer;
+  end;
+
+  TMedicamento = array[0..2] of integer;
+
+  TPaciente = record
+    nombreCompleto: string;
+    edad: integer;
+    altura: real;
+    fechaNacimiento: TFecha;
+    medicamento: TMedicamento;
+    tope: integer;
+  end;
+
+var
+  paciente: TPaciente;
+
+begin
+  // Inicializamos el tope
+  paciente.tope := -1;
+  
+  // Tu código aquí...
+end.</div>
+            </div>
+            <div class="visual-panel">
+                <div class="panel-title">Visualización del Registro</div>
+                <div class="record-container" id="record-container">
+                    <!-- Fields will be generated by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <div class="terminal-panel">
+            <div class="panel-title">Terminal Pascal</div>
+            <div class="terminal-output" id="terminal-output">>> Escribe el código Pascal para asignar el mes de nacimiento como 'Enero':</div>
+            <div class="terminal-input">
+                <span class="prompt">>></span>
+                <input type="text" class="terminal" id="terminal-input" placeholder="Escribe tu código Pascal aquí...">
+            </div>
+            <div class="input-hint">Presiona Enter para validar tu código (ignoramos espacios extras)</div>
+            <div class="feedback" id="feedback"></div>
+            
+            <!-- Modo libre solo para el último ejercicio -->
+            <div id="free-mode-container" style="display: none;">
+                <div class="free-mode-panel">
+                    <h3>Modo Libre: Asigna cualquier campo</h3>
+                    <select class="field-selector" id="field-selector">
+                        <option value="">-- Selecciona un campo --</option>
+                        <option value="nombreCompleto">Nombre y Apellidos (string)</option>
+                        <option value="edad">Edad (integer)</option>
+                        <option value="altura">Altura (real)</option>
+                        <option value="fechaNacimiento.dia">Fecha: Día (integer)</option>
+                        <option value="fechaNacimiento.mes">Fecha: Mes (string)</option>
+                        <option value="fechaNacimiento.anio">Fecha: Año (integer)</option>
+                        <option value="medicamento[0]">Medicamento [0] (integer)</option>
+                        <option value="medicamento[1]">Medicamento [1] (integer)</option>
+                        <option value="medicamento[2]">Medicamento [2] (integer)</option>
+                        <option value="tope">Tope (integer)</option>
+                    </select>
+                    
+                    <div class="free-input-container">
+                        <span class="prompt">>></span>
+                        <input type="text" class="terminal" id="free-input" placeholder="Escribe el valor...">
+                        <button class="btn btn-assign" id="btn-assign">Asignar</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="controls">
+                <button class="btn btn-reset" id="btn-reset">Reiniciar</button>
+                <button class="btn btn-next" id="btn-next">Siguiente Ejercicio</button>
+            </div>
+        </div>
+
+        <div class="exercise-nav">
+            <div class="exercise-btn active" data-exercise="1">1</div>
+            <div class="exercise-btn" data-exercise="2">2</div>
+            <div class="exercise-btn" data-exercise="3">3</div>
+            <div class="exercise-btn" data-exercise="4">4</div>
+            <div class="exercise-btn" data-exercise="5">5</div>
+        </div>
+    </div>
+
+    <script>
+        // State variables
+        let currentExercise = 1;
+        let patientRecord = {
+            nombreCompleto: '',
+            edad: 0,
+            altura: 0.0,
+            fechaNacimiento: {
+                dia: 0,
+                mes: '',
+                anio: 0
+            },
+            medicamento: [0, 0, 0],
+            tope: -1
+        };
+        
+        // Exercise configurations
+        const exercises = [
+            {
+                number: 1,
+                description: "Repaso: Asigna el mes de nacimiento del paciente con el valor 'Enero'.",
+                prompt: "Escribe el código Pascal para asignar el mes de nacimiento como 'Enero':",
+                expectedCode: "paciente.fechaNacimiento.mes := 'Enero';",
+                field: 'fechaNacimiento.mes',
+                value: 'Enero',
+                code: `type
+  TFecha = record
+    dia: integer;
+    mes: string;
+    anio: integer;
+  end;
+
+  TMedicamento = array[0..2] of integer;
+
+  TPaciente = record
+    nombreCompleto: string;
+    edad: integer;
+    altura: real;
+    fechaNacimiento: TFecha;
+    medicamento: TMedicamento;
+    tope: integer;
+  end;
+
+var
+  paciente: TPaciente;
+
+begin
+  paciente.tope := -1;
+  
+  // Asignar el mes de nacimiento
+  // Tu código aquí...
+end.`,
+                outputPrompt: "Escribe el código Pascal para asignar el mes de nacimiento como 'Enero':"
+            },
+            {
+                number: 2,
+                description: "Guarda el código 666 en la primera posición del array de medicamentos (índice 0).",
+                prompt: "Escribe el código Pascal para asignar el medicamento en la posición 0:",
+                expectedCode: "paciente.medicamento[0] := 666;",
+                field: 'medicamento.0',
+                value: 666,
+                code: `type
+  TFecha = record
+    dia: integer;
+    mes: string;
+    anio: integer;
+  end;
+
+  TMedicamento = array[0..2] of integer;
+
+  TPaciente = record
+    nombreCompleto: string;
+    edad: integer;
+    altura: real;
+    fechaNacimiento: TFecha;
+    medicamento: TMedicamento;
+    tope: integer;
+  end;
+
+var
+  paciente: TPaciente;
+
+begin
+  paciente.tope := -1;
+  
+  // Asignar medicamento en posición 0
+  // Tu código aquí...
+end.`,
+                outputPrompt: "Escribe el código Pascal para asignar el medicamento en la posición 0:"
+            },
+            {
+                number: 3,
+                description: "Incrementa el tope en 1 para indicar que hemos añadido un medicamento.",
+                prompt: "Escribe el código Pascal para incrementar el tope:",
+                expectedCode: "paciente.tope := paciente.tope + 1;",
+                field: 'tope',
+                value: 0,
+                code: `type
+  TFecha = record
+    dia: integer;
+    mes: string;
+    anio: integer;
+  end;
+
+  TMedicamento = array[0..2] of integer;
+
+  TPaciente = record
+    nombreCompleto: string;
+    edad: integer;
+    altura: real;
+    fechaNacimiento: TFecha;
+    medicamento: TMedicamento;
+    tope: integer;
+  end;
+
+var
+  paciente: TPaciente;
+
+begin
+  paciente.tope := -1;
+  
+  // Incrementar el tope
+  // Tu código aquí...
+end.`,
+                outputPrompt: "Escribe el código Pascal para incrementar el tope:"
+            },
+            {
+                number: 4,
+                description: "Guarda el código 413 en la posición actual del tope.",
+                prompt: "Escribe el código Pascal para asignar el medicamento en la posición del tope:",
+                expectedCode: "paciente.medicamento[paciente.tope] := 413;",
+                field: 'medicamento.tope',
+                value: 413,
+                code: `type
+  TFecha = record
+    dia: integer;
+    mes: string;
+    anio: integer;
+  end;
+
+  TMedicamento = array[0..2] of integer;
+
+  TPaciente = record
+    nombreCompleto: string;
+    edad: integer;
+    altura: real;
+    fechaNacimiento: TFecha;
+    medicamento: TMedicamento;
+    tope: integer;
+  end;
+
+var
+  paciente: TPaciente;
+
+begin
+  paciente.tope := -1;
+  
+  // Asignar medicamento en la posición del tope
+  // Tu código aquí...
+end.`,
+                outputPrompt: "Escribe el código Pascal para asignar el medicamento en la posición del tope:"
+            },
+            {
+                number: 5,
+                description: "Modo libre: Asigna cualquier campo del registro",
+                prompt: "",
+                expectedCode: "",
+                field: '',
+                value: '',
+                code: `type
+  TFecha = record
+    dia: integer;
+    mes: string;
+    anio: integer;
+  end;
+
+  TMedicamento = array[0..2] of integer;
+
+  TPaciente = record
+    nombreCompleto: string;
+    edad: integer;
+    altura: real;
+    fechaNacimiento: TFecha;
+    medicamento: TMedicamento;
+    tope: integer;
+  end;
+
+var
+  paciente: TPaciente;
+
+begin
+  paciente.tope := -1;
+  
+  // Modo libre: puedes asignar cualquier campo
+end.`,
+                outputPrompt: "Modo libre: Selecciona un campo y asigna un valor"
+            }
+        ];
+
+        // Field types for validation
+        const fieldTypes = {
+            'nombreCompleto': 'string',
+            'edad': 'integer',
+            'altura': 'real',
+            'fechaNacimiento.dia': 'integer',
+            'fechaNacimiento.mes': 'string',
+            'fechaNacimiento.anio': 'integer',
+            'medicamento[0]': 'integer',
+            'medicamento[1]': 'integer',
+            'medicamento[2]': 'integer',
+            'tope': 'integer'
+        };
+
+        // DOM elements
+        const exerciseNumberEl = document.getElementById('exercise-number');
+        const exerciseDescriptionEl = document.getElementById('exercise-description');
+        const pascalCodeEl = document.getElementById('pascal-code');
+        const recordContainerEl = document.getElementById('record-container');
+        const terminalOutputEl = document.getElementById('terminal-output');
+        const terminalInputEl = document.getElementById('terminal-input');
+        const feedbackEl = document.getElementById('feedback');
+        const btnReset = document.getElementById('btn-reset');
+        const btnNext = document.getElementById('btn-next');
+        const exerciseBtns = document.querySelectorAll('.exercise-btn');
+        const freeModeContainer = document.getElementById('free-mode-container');
+        const fieldSelector = document.getElementById('field-selector');
+        const freeInput = document.getElementById('free-input');
+        const btnAssign = document.getElementById('btn-assign');
+
+        // Initialize the simulator
+        function initSimulator() {
+            renderRecordFields();
+            updateExerciseUI();
+            terminalInputEl.focus();
+        }
+
+        // Render record fields in vertical lines with nested records and array
+        function renderRecordFields() {
+            recordContainerEl.innerHTML = '';
+            
+            // Main fields
+            renderField('nombreCompleto', 'Nombre y Apellidos');
+            renderField('edad', 'Edad');
+            renderField('altura', 'Altura (m)');
+            
+            // Nested date record
+            const dateField = document.createElement('div');
+            dateField.className = 'record-field';
+            dateField.innerHTML = `
+                <div class="field-info">
+                    <div class="field-name">Fecha de Nacimiento</div>
+                    <div class="field-type">TFecha</div>
+                </div>
+                <div class="field-value empty-value">Registro anidado</div>
+            `;
+            recordContainerEl.appendChild(dateField);
+            
+            // Nested fields container
+            const nestedContainer = document.createElement('div');
+            nestedContainer.className = 'nested-record';
+            
+            renderNestedField('fechaNacimiento.dia', 'Día', nestedContainer);
+            renderNestedField('fechaNacimiento.mes', 'Mes', nestedContainer);
+            renderNestedField('fechaNacimiento.anio', 'Año', nestedContainer);
+            
+            recordContainerEl.appendChild(nestedContainer);
+            
+            // Medicamentos array
+            const arrayField = document.createElement('div');
+            arrayField.className = 'record-field';
+            arrayField.innerHTML = `
+                <div class="field-info">
+                    <div class="field-name">Medicamentos</div>
+                    <div class="field-type type-array">TMedicamento</div>
+                </div>
+                <div class="field-value empty-value">Array[0..2]</div>
+            `;
+            recordContainerEl.appendChild(arrayField);
+            
+            // Array container
+            const arrayContainer = document.createElement('div');
+            arrayContainer.className = 'array-container';
+            
+            const arrayTitle = document.createElement('div');
+            arrayTitle.className = 'array-title';
+            arrayTitle.innerHTML = `
+                <span>Medicamentos (códigos)</span>
+                <span class="type-integer">Tope: ${patientRecord.tope}</span>
+            `;
+            arrayContainer.appendChild(arrayTitle);
+            
+            const arrayGrid = document.createElement('div');
+            arrayGrid.className = 'array-grid';
+            
+            for (let i = 0; i < 3; i++) {
+                const arrayItem = document.createElement('div');
+                arrayItem.className = 'array-item';
+                
+                const index = document.createElement('div');
+                index.className = 'array-index';
+                index.textContent = `[${i}]`;
+                
+                const value = document.createElement('div');
+                value.className = 'array-value';
+                value.textContent = patientRecord.medicamento[i] === 0 ? 'Vacío' : patientRecord.medicamento[i];
+                value.style.color = patientRecord.medicamento[i] !== 0 ? 'var(--array)' : 'var(--text-color)';
+                
+                arrayItem.appendChild(index);
+                arrayItem.appendChild(value);
+                
+                // Add tope indicator
+                if (i === patientRecord.tope) {
+                    const topeIndicator = document.createElement('div');
+                    topeIndicator.className = 'tope-indicator';
+                    topeIndicator.textContent = '↑ Tope';
+                    arrayItem.appendChild(topeIndicator);
+                }
+                
+                arrayGrid.appendChild(arrayItem);
+            }
+            
+            arrayContainer.appendChild(arrayGrid);
+            recordContainerEl.appendChild(arrayContainer);
+            
+            // Tope field
+            const topeField = document.createElement('div');
+            topeField.className = 'record-field';
+            topeField.innerHTML = `
+                <div class="field-info">
+                    <div class="field-name">Tope</div>
+                    <div class="field-type type-integer">integer</div>
+                </div>
+                <div class="field-value ${patientRecord.tope === -1 ? 'empty-value' : ''}">
+                    ${patientRecord.tope === -1 ? 'Sin asignar' : patientRecord.tope}
+                </div>
+            `;
+            recordContainerEl.appendChild(topeField);
+        }
+        
+        // Render a main record field
+        function renderField(field, displayName) {
+            const fieldType = getFieldType(field);
+            const fieldElement = document.createElement('div');
+            fieldElement.className = 'record-field';
+            
+            const value = getFieldValue(field);
+            
+            fieldElement.innerHTML = `
+                <div class="field-info">
+                    <div class="field-name">${displayName}</div>
+                    <div class="field-type type-${fieldType}">${getTypeName(fieldType)}</div>
+                </div>
+                <div class="field-value ${value === '' || value === 0 ? 'empty-value' : ''}">
+                    ${formatValue(value, fieldType)}
+                </div>
+            `;
+            
+            recordContainerEl.appendChild(fieldElement);
+        }
+        
+        // Render a nested record field
+        function renderNestedField(field, displayName, container) {
+            const fieldType = getFieldType(field);
+            const fieldElement = document.createElement('div');
+            fieldElement.className = 'record-field';
+            
+            const value = getFieldValue(field);
+            
+            fieldElement.innerHTML = `
+                <div class="field-info">
+                    <div class="field-name">${displayName}</div>
+                    <div class="field-type type-${fieldType}">${getTypeName(fieldType)}</div>
+                </div>
+                <div class="field-value ${value === '' || value === 0 ? 'empty-value' : ''}">
+                    ${formatValue(value, fieldType)}
+                </div>
+            `;
+            
+            container.appendChild(fieldElement);
+        }
+        
+        // Get nested field value
+        function getFieldValue(path) {
+            const parts = path.split('.');
+            let value = patientRecord;
+            
+            for (const part of parts) {
+                if (value[part] === undefined) return '';
+                value = value[part];
+            }
+            
+            return value;
+        }
+
+        // Get field type based on field name
+        function getFieldType(field) {
+            if (field.includes('anio') || field.includes('dia') || field.includes('edad') || field.includes('tope')) return 'integer';
+            if (field.includes('altura')) return 'real';
+            if (field.includes('mes') || field.includes('nombreCompleto')) return 'string';
+            return 'string';
+        }
+
+        // Get type name for display
+        function getTypeName(type) {
+            const typeNames = {
+                'string': 'string',
+                'integer': 'integer',
+                'real': 'real'
+            };
+            return typeNames[type] || type;
+        }
+
+        // Format value for display
+        function formatValue(value, type) {
+            if (value === '' || (value === 0 && type !== 'integer')) return 'Sin asignar';
+            
+            switch(type) {
+                case 'string': return `"${value}"`;
+                case 'integer': return value;
+                case 'real': {
+                    // Format to 1-2 decimal places
+                    const num = parseFloat(value);
+                    return num % 1 === 0 ? `${num}.0` : num.toFixed(2);
+                }
+                default: return value;
+            }
+        }
+
+        // Update UI based on current exercise
+        function updateExerciseUI() {
+            const exercise = exercises[currentExercise - 1];
+            
+            exerciseNumberEl.textContent = exercise.number;
+            exerciseDescriptionEl.innerHTML = exercise.description;
+            pascalCodeEl.textContent = exercise.code;
+            
+            // Update terminal output
+            terminalOutputEl.textContent = `>>> ${exercise.outputPrompt}`;
+            
+            // Highlight the active exercise button
+            exerciseBtns.forEach(btn => {
+                if (parseInt(btn.dataset.exercise) === currentExercise) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            
+            // Clear feedback
+            feedbackEl.textContent = '';
+            feedbackEl.className = 'feedback';
+            
+            // Clear input
+            terminalInputEl.value = '';
+            
+            // Update input placeholder
+            terminalInputEl.placeholder = "Escribe tu código Pascal aquí...";
+            
+            // Show/hide free mode
+            if (currentExercise === 5) {
+                freeModeContainer.style.display = 'block';
+                terminalInputEl.style.display = 'none';
+                document.querySelector('.input-hint').style.display = 'none';
+                document.querySelector('.prompt').style.display = 'none';
+                btnNext.textContent = 'Finalizar';
+		btnNext.id = 'btn-finish'; // Añade esta línea
+
+            } else {
+                freeModeContainer.style.display = 'none';
+                terminalInputEl.style.display = 'block';
+                document.querySelector('.input-hint').style.display = 'block';
+                document.querySelector('.prompt').style.display = 'block';
+                btnNext.textContent = 'Siguiente Ejercicio';
+            }
+        }
+
+        // Normalize code for comparison (remove extra spaces and case sensitivity)
+        function normalizeCode(code) {
+            return code
+                .replace(/\s+/g, '') // Remove all whitespace
+                .toLowerCase();      // Convert to lowercase
+        }
+
+        // Validate user code input
+        function validateCodeInput(input, expectedCode) {
+            const normalizedInput = normalizeCode(input);
+            const normalizedExpected = normalizeCode(expectedCode);
+            
+            return normalizedInput === normalizedExpected;
+        }
+
+        // Handle terminal input for exercises 1-4
+        function handleTerminalInput() {
+            const exercise = exercises[currentExercise - 1];
+            const inputValue = terminalInputEl.value;
+            
+            if (inputValue.trim() === '') {
+                feedbackEl.textContent = 'Error: Por favor escribe un valor';
+                feedbackEl.className = 'feedback error';
+                return;
+            }
+            
+            const isValid = validateCodeInput(inputValue, exercise.expectedCode);
+            
+            if (!isValid) {
+                feedbackEl.innerHTML = `
+                    <strong>Error en la sintaxis:</strong> La asignación no es correcta.
+                    <br><br>
+                    <strong>Posibles errores:</strong>
+                    <ul>
+                        <li>¿Usaste la ruta completa al campo? (paciente.${exercise.field.split('.')[0]}.${exercise.field.split('.')[1]})</li>
+                        <li>¿Incluiste el operador de asignación (:=)?</li>
+                        <li>¿Terminaste la sentencia con punto y coma (;)?</li>
+                        <li>¿Usaste el índice correcto para el array? (0, 1 o 2)</li>
+                    </ul>
+                    <br>
+                    <strong>Código correcto:</strong>
+                    <div class="code-example correct-code">${exercise.expectedCode}</div>
+                `;
+                feedbackEl.className = 'feedback error';
+                return;
+            }
+            
+            // Update the record based on exercise
+            if (exercise.field.startsWith('fechaNacimiento')) {
+                patientRecord.fechaNacimiento.mes = exercise.value;
+            } else if (exercise.field.startsWith('medicamento.0')) {
+                patientRecord.medicamento[0] = exercise.value;
+            } else if (exercise.field.startsWith('medicamento.tope')) {
+                patientRecord.medicamento[patientRecord.tope] = exercise.value;
+            } else if (exercise.field === 'tope') {
+                patientRecord.tope = exercise.value;
+            }
+            
+            // Update UI
+            renderRecordFields();
+            
+            feedbackEl.innerHTML = `
+                <strong>¡Correcto!</strong> Has escrito el código Pascal adecuado.
+                <br><br>
+                <strong>Código:</strong>
+                <div class="code-example">${inputValue}</div>
+                <br>
+                El campo <span class="highlight">${exercise.field}</span> se ha actualizado a ${exercise.value}.
+            `;
+            feedbackEl.className = 'feedback success';
+            
+            // Auto-advance to next exercise after a delay
+            setTimeout(() => {
+                if (currentExercise < exercises.length) {
+                    currentExercise++;
+                    updateExerciseUI();
+                }
+            }, 2500);
+        }
+
+        // Validate free mode input
+        function validateFreeInput(value, fieldType) {
+            value = value.trim();
+            
+            switch(fieldType) {
+                case 'integer':
+                    // No se permiten decimales en enteros
+                    if (value.includes('.')) return null;
+                    const intValue = parseInt(value);
+                    return isNaN(intValue) ? null : intValue;
+                    
+                case 'real':
+                    const floatValue = parseFloat(value);
+                    return isNaN(floatValue) ? null : floatValue;
+                    
+                case 'string':
+                    return value;
+                    
+                default:
+                    return null;
+            }
+        }
+
+        // Set field value in the record
+        function setFieldValue(path, value) {
+            const parts = path.split('.');
+            let current = patientRecord;
+            
+            // Handle array fields like medicamento[0]
+            if (path.includes('[')) {
+                const match = path.match(/(\w+)\[(\d+)\]/);
+                if (match) {
+                    const arrayName = match[1];
+                    const index = parseInt(match[2]);
+                    patientRecord[arrayName][index] = value;
+                    return true;
+                }
+            }
+            
+            // Handle nested fields
+            for (let i = 0; i < parts.length - 1; i++) {
+                current = current[parts[i]];
+            }
+            
+            const lastPart = parts[parts.length - 1];
+            current[lastPart] = value;
+            return true;
+        }
+
+        // Handle free mode assignment
+        function handleFreeAssignment() {
+            const selectedField = fieldSelector.value;
+            const inputValue = freeInput.value;
+            
+            if (!selectedField) {
+                feedbackEl.textContent = 'Error: Por favor selecciona un campo';
+                feedbackEl.className = 'feedback error';
+                return;
+            }
+            
+            if (inputValue.trim() === '') {
+                feedbackEl.textContent = 'Error: Por favor escribe un valor';
+                feedbackEl.className = 'feedback error';
+                return;
+            }
+            
+            // Get field type
+            const fieldType = fieldTypes[selectedField];
+            const validatedValue = validateFreeInput(inputValue, fieldType);
+            
+            if (validatedValue === null) {
+                feedbackEl.textContent = `Error: Valor inválido para tipo ${fieldType}`;
+                feedbackEl.className = 'feedback error';
+                return;
+            }
+            
+            // Update the record
+            setFieldValue(selectedField, validatedValue);
+            
+            // Update UI
+            renderRecordFields();
+            
+            feedbackEl.innerHTML = `
+                <strong>¡Correcto!</strong> Campo actualizado correctamente.
+                <br><br>
+                <strong>Campo:</strong> ${selectedField}
+                <br>
+                <strong>Valor:</strong> ${formatValue(validatedValue, fieldType)}
+                <br>
+                <strong>Tipo:</strong> ${fieldType}
+            `;
+            feedbackEl.className = 'feedback success';
+            
+            // Clear input
+            freeInput.value = '';
+        }
+
+        // Handle next button click
+        function handleNext() {
+            if (currentExercise < exercises.length) {
+                currentExercise++;
+                updateExerciseUI();
+            } else {
+                // Show completion message
+                feedbackEl.textContent = '¡Felicidades! Has completado todos los ejercicios. Ahora puedes usar el modo libre.';
+                feedbackEl.className = 'feedback success';
+                // Redirigir a index.html después de completar todos los ejercicios
+      		window.location.href = "index.html"
+            }
+        }
+
+
+        // Handle reset button click
+        function handleReset() {
+            // Reset record values
+            patientRecord = {
+                nombreCompleto: '',
+                edad: 0,
+                altura: 0.0,
+                fechaNacimiento: {
+                    dia: 0,
+                    mes: '',
+                    anio: 0
+                },
+                medicamento: [0, 0, 0],
+                tope: -1
+            };
+            
+            // Reset to first exercise
+            currentExercise = 1;
+            
+            // Update UI
+            renderRecordFields();
+            updateExerciseUI();
+            
+            feedbackEl.textContent = 'Simulación reiniciada. Puedes comenzar de nuevo.';
+            feedbackEl.className = 'feedback success';
+            setTimeout(() => {
+                feedbackEl.textContent = '';
+                feedbackEl.className = 'feedback';
+            }, 2000);
+        }
+
+        // Handle exercise button clicks
+        function handleExerciseBtnClick(e) {
+            const exerciseNum = parseInt(e.target.dataset.exercise);
+            if (exerciseNum !== currentExercise) {
+                currentExercise = exerciseNum;
+                updateExerciseUI();
+            }
+        }
+
+        // Add event listeners
+        btnNext.addEventListener('click', handleNext);
+        btnReset.addEventListener('click', handleReset);
+        btnAssign.addEventListener('click', handleFreeAssignment);
+        
+        terminalInputEl.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                handleTerminalInput();
+            }
+        });
+        
+        freeInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                handleFreeAssignment();
+            }
+        });
+        
+        exerciseBtns.forEach(btn => {
+            btn.addEventListener('click', handleExerciseBtnClick);
+        });
+
+        // Initialize the simulator when the page loads
+        window.addEventListener('DOMContentLoaded', initSimulator);
+
+	document.addEventListener('click', function(e) {
+        if (e.target && e.target.id === 'btn-finish') {
+        window.location.href = "index.html";
+    }
+});
+    </script>
+</body>
+</html>

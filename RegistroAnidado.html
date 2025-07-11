@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Registros Anidados en Pascal</title>
+    <style>
+        :root {
+            --bg-main: #1e1e1e;
+            --bg-panel: #2d2d2d;
+            --bg-box: #3a3a3a;
+            --text-color: #e0e0e0;
+            --success: #6ecf68;
+            --error: #f75e5e;
+            --warning: #f7c85e;
+            --integer: #5e8cff;
+            --real: #d966ff;
+            --string: #6ecf68;
+            --char: #5ed9ff;
+            --border: #444;
+            --shadow: rgba(0, 0, 0, 0.3);
+            --terminal-bg: #1a1a1a;
+            --nested-bg: #333;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: var(--bg-main);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Header Styles */
+        header {
+            background-color: var(--bg-panel);
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px var(--shadow);
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .title-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            width: 60px;
+            height: 60px;
+            background-color: var(--success);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--bg-main);
+            box-shadow: 0 2px 5px var(--shadow);
+        }
+
+        h1 {
+            font-size: 1.8rem;
+        }
+
+        .author {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 0.8rem;
+            color: #ccc;
+        }
+
+        /* Introduction Panel */
+        .intro-panel {
+            background-color: var(--bg-panel);
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px var(--shadow);
+            margin-bottom: 20px;
+            border-left: 4px solid var(--warning);
+        }
+
+        .intro-title {
+            color: var(--warning);
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        /* Exercise Panel */
+        .exercise-panel {
+            background-color: var(--bg-panel);
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px var(--shadow);
+            margin-bottom: 20px;
+        }
+
+        .exercise-title {
+            color: var(--warning);
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        .exercise-description {
+            margin-bottom: 10px;
+        }
+
+        /* Main Content */
+        .main-content {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .code-panel, .visual-panel {
+            background-color: var(--bg-panel);
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px var(--shadow);
+            flex: 1;
+            min-height: 350px;
+        }
+
+        .panel-title {
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        /* Code Panel */
+        .pascal-code {
+            background-color: var(--bg-box);
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', Courier, monospace;
+            white-space: pre-wrap;
+            overflow-x: auto;
+            min-height: 300px;
+            line-height: 1.5;
+        }
+
+        .code-keyword {
+            color: #569cd6;
+        }
+
+        .code-type {
+            color: #4ec9b0;
+        }
+
+        .code-comment {
+            color: #6a9955;
+        }
+
+        /* Visual Panel - Registro vertical */
+        .record-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            min-height: 300px;
+        }
+
+        .record-field {
+            background-color: var(--bg-box);
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px var(--shadow);
+        }
+
+        .field-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .field-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .field-type {
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+
+        .field-value {
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            padding: 8px 15px;
+            min-width: 100px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        /* Registro anidado */
+        .nested-record {
+            background-color: var(--nested-bg);
+            border-radius: 5px;
+            padding: 10px;
+            margin-top: 10px;
+            margin-left: 20px;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.3);
+        }
+
+        .nested-record .record-field {
+            background-color: var(--bg-main);
+            margin-bottom: 8px;
+        }
+
+        .nested-record .record-field:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Terminal Panel */
+        .terminal-panel {
+            background-color: var(--terminal-bg);
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px var(--shadow);
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        .terminal-output {
+            background-color: var(--terminal-bg);
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            min-height: 100px;
+            max-height: 200px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            font-family: 'Courier New', Courier, monospace;
+            border: 1px solid var(--border);
+            line-height: 1.5;
+        }
+
+        .terminal-input {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .prompt {
+            color: var(--success);
+            font-weight: bold;
+        }
+
+        .terminal {
+            flex-grow: 1;
+            background-color: var(--bg-main);
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            padding: 10px;
+            font-family: 'Courier New', Courier, monospace;
+            color: var(--text-color);
+            outline: none;
+        }
+
+        .terminal:focus {
+            border-color: var(--warning);
+        }
+
+        .btn {
+            background-color: var(--bg-box);
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            padding: 10px 15px;
+            color: var(--text-color);
+            font-family: 'Courier New', Courier, monospace;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px var(--shadow);
+        }
+
+        .btn-next {
+            background-color: var(--success);
+            color: var(--bg-main);
+        }
+
+        .btn-reset {
+            background-color: var(--error);
+            color: var(--bg-main);
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+        }
+
+        /* Feedback messages */
+        .feedback {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 3px;
+            text-align: left;
+            font-weight: normal;
+            display: none;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .success {
+            background-color: rgba(110, 207, 104, 0.15);
+            color: var(--success);
+            border: 1px solid var(--success);
+            display: block;
+        }
+
+        .error {
+            background-color: rgba(247, 94, 94, 0.15);
+            color: var(--error);
+            border: 1px solid var(--error);
+            display: block;
+        }
+
+        /* Exercise Navigation */
+        .exercise-nav {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .exercise-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--bg-box);
+            border: 1px solid var(--border);
+            color: var(--text-color);
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .exercise-btn.active {
+            background-color: var(--warning);
+            color: var(--bg-main);
+        }
+
+        .exercise-btn:hover:not(.active) {
+            background-color: var(--bg-panel);
+        }
+
+        /* Type-specific colors */
+        .type-integer { color: var(--integer); }
+        .type-real { color: var(--real); }
+        .type-string { color: var(--string); }
+        .type-char { color: var(--char); }
+        
+        /* Input hint */
+        .input-hint {
+            color: #aaa;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+        
+        /* Value formatting */
+        .empty-value {
+            color: #888;
+            font-style: italic;
+        }
+        
+        /* Syntax highlighting in feedback */
+        .code-example {
+            background-color: var(--bg-box);
+            padding: 3px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', Courier, monospace;
+            display: inline-block;
+            margin: 3px 0;
+        }
+        
+        .correct-code {
+            color: var(--success);
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="title-container">
+                <div class="logo">O</div>
+                <h1>🧪 Simulador de Registros Anidados en Pascal</h1>
+            </div>
+            <div class="author">Oriol Borrás-Gené (URJC)</div>
+        </header>
+
+        <div class="intro-panel">
+            <div class="intro-title">Introducción</div>
+            <div class="intro-description">
+                Ahora vamos a trabajar con registros anidados. Hemos añadido un campo "fechaNacimiento" que es otro registro con tres campos: día (entero), mes (string) y año (entero). Observa cómo se accede a los campos anidados en Pascal.
+            </div>
+        </div>
+
+        <div class="exercise-panel">
+            <div class="exercise-title">Ejercicio <span id="exercise-number">1</span>/5</div>
+            <div class="exercise-description" id="exercise-description">
+                Escribe el código Pascal para asignar el año 1978 al campo "anio" del registro anidado "fechaNacimiento" del paciente.
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="code-panel">
+                <div class="panel-title">Código Pascal</div>
+                <div class="pascal-code" id="pascal-code">type
+  TFecha = record
+    dia: integer;
+    mes: string;
+    anio: integer;
+  end;
+
+  TPaciente = record
+    nombreCompleto: string;
+    edad: integer;
+    altura: real;
+    fechaNacimiento: TFecha;
+  end;
+
+var
+  paciente: TPaciente;
+
+begin
+  // Tu código aquí...
+end.</div>
+            </div>
+            <div class="visual-panel">
+                <div class="panel-title">Visualización del Registro</div>
+                <div class="record-container" id="record-container">
+                    <!-- Fields will be generated by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <div class="terminal-panel">
+            <div class="panel-title">Terminal Pascal</div>
+            <div class="terminal-output" id="terminal-output">>> Escribe la asignación para el campo año de nacimiento:</div>
+            <div class="terminal-input">
+                <span class="prompt">>></span>
+                <input type="text" class="terminal" id="terminal-input" placeholder="Escribe tu código Pascal aquí...">
+            </div>
+            <div class="input-hint">Presiona Enter para validar tu código</div>
+            <div class="feedback" id="feedback"></div>
+            <div class="controls">
+                <button class="btn btn-reset" id="btn-reset">Reiniciar</button>
+                <button class="btn btn-next" id="btn-next">Siguiente Ejercicio</button>
+            </div>
+        </div>
+
+        <div class="exercise-nav">
+            <div class="exercise-btn active" data-exercise="1">1</div>
+            <div class="exercise-btn" data-exercise="2">2</div>
+            <div class="exercise-btn" data-exercise="3">3</div>
+            <div class="exercise-btn" data-exercise="4">4</div>
+            <div class="exercise-btn" data-exercise="5">5</div>
+        </div>
+    </div>
+
+    <script>
+        // State variables
+        let currentExercise = 1;
+        let patientRecord = {
+            nombreCompleto: '',
+            edad: 0,
+            altura: 0.0,
+            fechaNacimiento: {
+                dia: 0,
+                mes: '',
+                anio: 0
+            }
+        };
+        
+        // Exercise configurations
+        const exercises = [
+            {
+                number: 1,
+                description: "Escribe el código Pascal para asignar el año 1978 al campo \"anio\" del registro anidado \"fechaNacimiento\" del paciente.",
+                prompt: "Escribe la asignación para el campo año de nacimiento:",
+                expectedCode: "paciente.fechaNacimiento.anio := 1978;",
+                field: 'fechaNacimiento.anio',
+                code: `type
+  TFecha = record
+    dia: integer;
+    mes: string;
+    anio: integer;
+  end;
+
+  TPaciente = record
+    nombreCompleto: string;
+    edad: integer;
+    altura: real;
+    fechaNacimiento: TFecha;
+  end;
+
+var
+  paciente: TPaciente;
+
+begin
+  // Tu código aquí...
+end.`,
+                outputPrompt: "Escribe la asignación para el campo año de nacimiento:"
+            },
+            {
+                number: 2,
+                description: "Asigna el nombre completo del paciente.",
+                prompt: "Escribe el nombre y apellidos del paciente:",
+                expectedType: 'string',
+                field: 'nombreCompleto',
+                code: `type
+  TFecha = record
+    dia: integer;
+    mes: string;
+    anio: integer;
+  end;
+
+  TPaciente = record
+    nombreCompleto: string;
+    edad: integer;
+    altura: real;
+    fechaNacimiento: TFecha;
+  end;
+
+var
+  paciente: TPaciente;
+
+begin
+  writeln('Escribe el nombre y apellidos del paciente:');
+  readln(paciente.nombreCompleto);
+end.`,
+                outputPrompt: "Escribe el nombre y apellidos del paciente:"
+            },
+            {
+                number: 3,
+                description: "Asigna la edad del paciente (número entero).",
+                prompt: "Escribe la edad del paciente:",
+                expectedType: 'integer',
+                field: 'edad',
+                code: `type
+  TFecha = record
+    dia: integer;
+    mes: string;
+    anio: integer;
+  end;
+
+  TPaciente = record
+    nombreCompleto: string;
+    edad: integer;
+    altura: real;
+    fechaNacimiento: TFecha;
+  end;
+
+var
+  paciente: TPaciente;
+
+begin
+  writeln('Escribe la edad del paciente:');
+  readln(paciente.edad);
+end.`,
+                outputPrompt: "Escribe la edad del paciente:"
+            },
+            {
+                number: 4,
+                description: "Asigna la altura del paciente en metros (número real).",
+                prompt: "Escribe la altura del paciente en metros:",
+                expectedType: 'real',
+                field: 'altura',
+                code: `type
+  TFecha = record
+    dia: integer;
+    mes: string;
+    anio: integer;
+  end;
+
+  TPaciente = record
+    nombreCompleto: string;
+    edad: integer;
+    altura: real;
+    fechaNacimiento: TFecha;
+  end;
+
+var
+  paciente: TPaciente;
+
+begin
+  writeln('Escribe la altura del paciente en metros:');
+  readln(paciente.altura);
+end.`,
+                outputPrompt: "Escribe la altura del paciente en metros:"
+            },
+            {
+                number: 5,
+                description: "Asigna el día y mes de nacimiento del paciente.",
+                prompt: "Escribe el día de nacimiento (entero) y el mes (string):",
+                expectedType: 'mixed',
+                field: 'fechaNacimiento',
+                code: `type
+  TFecha = record
+    dia: integer;
+    mes: string;
+    anio: integer;
+  end;
+
+  TPaciente = record
+    nombreCompleto: string;
+    edad: integer;
+    altura: real;
+    fechaNacimiento: TFecha;
+  end;
+
+var
+  paciente: TPaciente;
+
+begin
+  writeln('Escribe el día de nacimiento:');
+  readln(paciente.fechaNacimiento.dia);
+  writeln('Escribe el mes de nacimiento:');
+  readln(paciente.fechaNacimiento.mes);
+end.`,
+                outputPrompt: "Escribe el día de nacimiento:"
+            }
+        ];
+
+        // DOM elements
+        const exerciseNumberEl = document.getElementById('exercise-number');
+        const exerciseDescriptionEl = document.getElementById('exercise-description');
+        const pascalCodeEl = document.getElementById('pascal-code');
+        const recordContainerEl = document.getElementById('record-container');
+        const terminalOutputEl = document.getElementById('terminal-output');
+        const terminalInputEl = document.getElementById('terminal-input');
+        const feedbackEl = document.getElementById('feedback');
+        const btnReset = document.getElementById('btn-reset');
+        const btnNext = document.getElementById('btn-next');
+        const exerciseBtns = document.querySelectorAll('.exercise-btn');
+
+        // Initialize the simulator
+        function initSimulator() {
+            renderRecordFields();
+            updateExerciseUI();
+            terminalInputEl.focus();
+        }
+
+        // Render record fields in vertical lines with nested records
+        function renderRecordFields() {
+            recordContainerEl.innerHTML = '';
+            
+            // Main fields
+            renderField('nombreCompleto', 'Nombre y Apellidos');
+            renderField('edad', 'Edad');
+            renderField('altura', 'Altura (m)');
+            
+            // Nested date record
+            const dateField = document.createElement('div');
+            dateField.className = 'record-field';
+            dateField.innerHTML = `
+                <div class="field-info">
+                    <div class="field-name">Fecha de Nacimiento</div>
+                    <div class="field-type">TFecha</div>
+                </div>
+                <div class="field-value empty-value">Registro anidado</div>
+            `;
+            recordContainerEl.appendChild(dateField);
+            
+            // Nested fields container
+            const nestedContainer = document.createElement('div');
+            nestedContainer.className = 'nested-record';
+            
+            renderNestedField('fechaNacimiento.dia', 'Día', nestedContainer);
+            renderNestedField('fechaNacimiento.mes', 'Mes', nestedContainer);
+            renderNestedField('fechaNacimiento.anio', 'Año', nestedContainer);
+            
+            recordContainerEl.appendChild(nestedContainer);
+        }
+        
+        // Render a main record field
+        function renderField(field, displayName) {
+            const fieldType = getFieldType(field);
+            const fieldElement = document.createElement('div');
+            fieldElement.className = 'record-field';
+            
+            const value = getFieldValue(field);
+            
+            fieldElement.innerHTML = `
+                <div class="field-info">
+                    <div class="field-name">${displayName}</div>
+                    <div class="field-type type-${fieldType}">${getTypeName(fieldType)}</div>
+                </div>
+                <div class="field-value ${value === '' || value === 0 ? 'empty-value' : ''}">
+                    ${formatValue(value, fieldType)}
+                </div>
+            `;
+            
+            recordContainerEl.appendChild(fieldElement);
+        }
+        
+        // Render a nested record field
+        function renderNestedField(field, displayName, container) {
+            const fieldType = getFieldType(field);
+            const fieldElement = document.createElement('div');
+            fieldElement.className = 'record-field';
+            
+            const value = getFieldValue(field);
+            
+            fieldElement.innerHTML = `
+                <div class="field-info">
+                    <div class="field-name">${displayName}</div>
+                    <div class="field-type type-${fieldType}">${getTypeName(fieldType)}</div>
+                </div>
+                <div class="field-value ${value === '' || value === 0 ? 'empty-value' : ''}">
+                    ${formatValue(value, fieldType)}
+                </div>
+            `;
+            
+            container.appendChild(fieldElement);
+        }
+        
+        // Format field name for display
+        function formatFieldName(field) {
+            if (field === 'nombreCompleto') return 'Nombre y Apellidos';
+            if (field === 'edad') return 'Edad';
+            if (field === 'altura') return 'Altura (m)';
+            if (field === 'fechaNacimiento.dia') return 'Día';
+            if (field === 'fechaNacimiento.mes') return 'Mes';
+            if (field === 'fechaNacimiento.anio') return 'Año';
+            return field;
+        }
+        
+        // Get nested field value
+        function getFieldValue(path) {
+            const parts = path.split('.');
+            let value = patientRecord;
+            
+            for (const part of parts) {
+                if (value[part] === undefined) return '';
+                value = value[part];
+            }
+            
+            return value;
+        }
+
+        // Get field type based on field name
+        function getFieldType(field) {
+            if (field.includes('anio') || field.includes('dia') || field.includes('edad')) return 'integer';
+            if (field.includes('altura')) return 'real';
+            if (field.includes('mes') || field.includes('nombreCompleto')) return 'string';
+            return 'string';
+        }
+
+        // Get type name for display
+        function getTypeName(type) {
+            const typeNames = {
+                'string': 'string',
+                'integer': 'integer',
+                'real': 'real'
+            };
+            return typeNames[type] || type;
+        }
+
+        // Format value for display
+        function formatValue(value, type) {
+            if (value === '' || (value === 0 && type !== 'integer')) return 'Sin asignar';
+            
+            switch(type) {
+                case 'string': return `"${value}"`;
+                case 'integer': return value;
+                case 'real': {
+                    // Format to 1-2 decimal places
+                    const num = parseFloat(value);
+                    return num % 1 === 0 ? `${num}.0` : num.toFixed(2);
+                }
+                default: return value;
+            }
+        }
+
+        // Update UI based on current exercise
+        function updateExerciseUI() {
+            const exercise = exercises[currentExercise - 1];
+            
+            exerciseNumberEl.textContent = exercise.number;
+            exerciseDescriptionEl.innerHTML = exercise.description;
+            pascalCodeEl.textContent = exercise.code;
+            
+            // Update terminal output
+            terminalOutputEl.textContent = `>>> ${exercise.outputPrompt}`;
+            
+            // Highlight the active exercise button
+            exerciseBtns.forEach(btn => {
+                if (parseInt(btn.dataset.exercise) === currentExercise) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            
+            // Clear feedback
+            feedbackEl.textContent = '';
+            feedbackEl.className = 'feedback';
+            
+            // Clear input
+            terminalInputEl.value = '';
+            
+            // Update input placeholder based on exercise type
+            if (currentExercise === 1) {
+                terminalInputEl.placeholder = "Escribe tu código Pascal aquí...";
+            } else if (currentExercise === 5) {
+                terminalInputEl.placeholder = "Primero escribe el día (entero)...";
+            } else {
+                terminalInputEl.placeholder = "Escribe tu respuesta y presiona Enter...";
+            }
+            
+            // Update button text for last exercise
+            if (currentExercise === exercises.length) {
+                btnNext.textContent = 'Finalizar';
+		   li.id = 'btn-finish'; // Añade esta línea
+
+            } else {
+                btnNext.textContent = 'Siguiente Ejercicio';
+            }
+        }
+
+        // Validate user input based on exercise type
+        function validateInput(input, exercise) {
+            input = input.trim();
+            
+            // Exercise 1 is special (code validation)
+            if (exercise.number === 1) {
+                const cleanInput = input.replace(/\s+/g, '').toLowerCase();
+                const cleanExpected = exercise.expectedCode.replace(/\s+/g, '').toLowerCase();
+                
+                return cleanInput === cleanExpected;
+            }
+            
+            // Exercise 5 has two inputs
+            if (exercise.number === 5) {
+                // First input is day (integer)
+                if (getFieldValue('fechaNacimiento.dia') === 0) {
+                    const dayValue = parseInt(input);
+                    if (isNaN(dayValue)) return null;
+                    
+                    // Update day value
+                    patientRecord.fechaNacimiento.dia = dayValue;
+                    
+                    // Update UI
+                    renderRecordFields();
+                    
+                    // Change prompt for month
+                    terminalOutputEl.textContent = ">>> Escribe el mes de nacimiento:";
+                    terminalInputEl.value = '';
+                    terminalInputEl.placeholder = "Ahora escribe el mes (string)...";
+                    
+                    return 'continue';
+                } else {
+                    // Second input is month (string)
+                    if (input.trim() === '') return null;
+                    
+                    patientRecord.fechaNacimiento.mes = input;
+                    renderRecordFields();
+                    return true;
+                }
+            }
+            
+            // Normal exercises (2-4)
+            switch(exercise.expectedType) {
+                case 'string':
+                    return input !== '' ? input : null;
+                    
+                case 'integer':
+                    if (input.includes('.')) return null;
+                    const intValue = parseInt(input);
+                    return isNaN(intValue) ? null : intValue;
+                    
+                case 'real':
+                    const floatValue = parseFloat(input);
+                    return isNaN(floatValue) ? null : floatValue;
+                    
+                default:
+                    return input;
+            }
+        }
+
+        // Handle terminal input
+        function handleTerminalInput() {
+            const exercise = exercises[currentExercise - 1];
+            const inputValue = terminalInputEl.value;
+            
+            if (inputValue.trim() === '') {
+                feedbackEl.textContent = 'Error: Por favor escribe un valor';
+                feedbackEl.className = 'feedback error';
+                return;
+            }
+            
+            const validationResult = validateInput(inputValue, exercise);
+            
+            // Handle exercise 5 intermediate step
+            if (validationResult === 'continue') {
+                feedbackEl.textContent = 'Día de nacimiento asignado correctamente. Ahora escribe el mes.';
+                feedbackEl.className = 'feedback success';
+                return;
+            }
+            
+            if (validationResult === null || validationResult === false) {
+                // Special feedback for exercise 1
+                if (exercise.number === 1) {
+                    feedbackEl.innerHTML = `
+                        <strong>Error en la sintaxis:</strong> La asignación no es correcta.
+                        <br><br>
+                        <strong>Posibles errores:</strong>
+                        <ul>
+                            <li>¿Usaste el nombre completo del registro anidado? (paciente.fechaNacimiento.anio)</li>
+                            <li>¿Incluiste el operador de asignación (:=)?</li>
+                            <li>¿Terminaste la sentencia con punto y coma (;)?</li>
+                        </ul>
+                        <br>
+                        <strong>Código correcto:</strong>
+                        <div class="code-example correct-code">${exercise.expectedCode}</div>
+                    `;
+                    feedbackEl.className = 'feedback error';
+                } else if (exercise.number === 5) {
+                    feedbackEl.textContent = 'Error: Valor inválido. Por favor escribe un valor adecuado.';
+                    feedbackEl.className = 'feedback error';
+                } else {
+                    feedbackEl.textContent = `Error: Valor inválido para tipo ${exercise.expectedType}`;
+                    feedbackEl.className = 'feedback error';
+                }
+                return;
+            }
+            
+            // For exercise 1 we have a code validation
+            if (exercise.number === 1) {
+                patientRecord.fechaNacimiento.anio = 1978;
+                renderRecordFields();
+                
+                feedbackEl.innerHTML = `
+                    <strong>¡Correcto!</strong> Has escrito el código Pascal adecuado.
+                    <br><br>
+                    <strong>Código:</strong>
+                    <div class="code-example">${inputValue}</div>
+                    <br>
+                    El campo año de nacimiento se ha actualizado a 1978.
+                `;
+                feedbackEl.className = 'feedback success';
+                
+                // Auto-advance to next exercise after a delay
+                setTimeout(() => {
+                    if (currentExercise < exercises.length) {
+                        currentExercise++;
+                        updateExerciseUI();
+                    }
+                }, 3000);
+                return;
+            }
+            
+            // For normal exercises, update the record
+            if (exercise.number !== 5) {
+                const fieldPath = exercise.field.split('.');
+                let recordPart = patientRecord;
+                
+                for (let i = 0; i < fieldPath.length - 1; i++) {
+                    recordPart = recordPart[fieldPath[i]];
+                }
+                
+                recordPart[fieldPath[fieldPath.length - 1]] = validationResult;
+            }
+            
+            // Update UI
+            renderRecordFields();
+            
+            // Show transformation message if needed
+            let transformationMsg = '';
+            if (exercise.expectedType === 'real' && Number.isInteger(parseFloat(validationResult))) {
+                transformationMsg = ` (convertido a ${parseFloat(validationResult).toFixed(1)})`;
+            }
+            
+            feedbackEl.innerHTML = `¡Correcto! Campo <strong>${formatFieldName(exercise.field)}</strong> actualizado: 
+                                   <span class="type-${exercise.expectedType}">${formatValue(validationResult, exercise.expectedType)}</span>${transformationMsg}`;
+            feedbackEl.className = 'feedback success';
+            
+            // Clear input
+            terminalInputEl.value = '';
+            
+            // Auto-advance to next exercise after a delay (except for exercise 5 which has two parts)
+            if (exercise.number !== 5) {
+                setTimeout(() => {
+                    if (currentExercise < exercises.length) {
+                        currentExercise++;
+                        updateExerciseUI();
+                    }
+                }, 1800);
+            }
+        }
+
+        // Handle next button click
+        function handleNext() {
+            if (currentExercise < exercises.length) {
+                currentExercise++;
+                updateExerciseUI();
+            } else {
+                // Show completion message
+                feedbackEl.textContent = '¡Felicidades! Has completado todos los ejercicios.';
+                feedbackEl.className = 'feedback success';
+		// Redirigir a index.html después de completar todos los ejercicios
+        	window.location.href = "index.html";
+            }
+        }
+
+        // Handle reset button click
+        function handleReset() {
+            // Reset record values
+            patientRecord = {
+                nombreCompleto: '',
+                edad: 0,
+                altura: 0.0,
+                fechaNacimiento: {
+                    dia: 0,
+                    mes: '',
+                    anio: 0
+                }
+            };
+            
+            // Reset to first exercise
+            currentExercise = 1;
+            
+            // Update UI
+            renderRecordFields();
+            updateExerciseUI();
+            
+            feedbackEl.textContent = 'Simulación reiniciada. Puedes comenzar de nuevo.';
+            feedbackEl.className = 'feedback success';
+            setTimeout(() => {
+                feedbackEl.textContent = '';
+                feedbackEl.className = 'feedback';
+            }, 2000);
+        }
+
+        // Handle exercise button clicks
+        function handleExerciseBtnClick(e) {
+            const exerciseNum = parseInt(e.target.dataset.exercise);
+            if (exerciseNum !== currentExercise) {
+                currentExercise = exerciseNum;
+                updateExerciseUI();
+            }
+        }
+
+        // Add event listeners
+        btnNext.addEventListener('click', handleNext);
+        btnReset.addEventListener('click', handleReset);
+        
+        terminalInputEl.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                handleTerminalInput();
+            }
+        });
+        
+        exerciseBtns.forEach(btn => {
+            btn.addEventListener('click', handleExerciseBtnClick);
+        });
+
+        // Initialize the simulator when the page loads
+        window.addEventListener('DOMContentLoaded', initSimulator);
+	document.addEventListener('click', function(e) {
+   	 if (e.target && e.target.id === 'btn-finish') {
+        	window.location.href = "index.html";
+    	}
+	});
+    </script>
+</body>
+</html>
